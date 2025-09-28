@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Service Optimiser</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app-root">
+    <div class="material-card">
+		<h1 class="app-content-title">Welcome to Service Optimiser</h1>
+
+		<div class="dual-pane">
+		<!-- Left: Tool Description -->
+			<div class="pane pane-left">
+				<h2 class="form-section-title">What this tool does</h2>
+				<p style="font-size: 1.07rem; line-height: 1.6;">
+					Service Optimiser helps you calculate the best production mix based on your inventory, product definitions, and sustainability goals. You can:
+				</p>
+				<ul style="margin-top: 1rem; padding-left: 1.2rem;">
+					<li>📦 Maximise profit without exceeding inventory</li>
+					<li>🌱 Minimise carbon footprint</li>
+					<li>⚖️ Balance multiple objectives</li>
+				</ul>
+
+				<h2 class="form-section-title" style="margin-top: 2rem;">How to use it</h2>
+				<ol style="padding-left: 1.2rem;">
+					<li>Set up your inventory and stock levels</li>
+					<li>Define products with cost, profit, and CO₂e</li>
+					<li>Choose optimisation goals and constraints</li>
+					<li>View and export the optimal production mix</li>
+				</ol>
+			</div>
+
+		<!-- Right: Navigation -->
+			<div class="pane pane-right">
+				<h2 class="form-section-title">Start Here</h2>
+				<div class="selector-btns">
+					<button onclick="navigate('inventory.html')" class="selector-btn">📦 Inventory Setup</button>
+					<button onclick="navigate('products.html')" class="selector-btn">🛠️ Product Setup</button>
+					<button onclick="navigate('parameters.html')" class="selector-btn">⚙️ Optimisation Parameters</button>
+					<button onclick="navigate('results.html')" class="selector-btn">📊 View Results</button>
+				</div>
+			</div>
+		</div>
+    </div>
+
+    <div class="tool-usage-note">
+      <strong>How to use this tool:</strong>
+      <ol>
+        <li><strong>Inventory Setup:</strong> Define your available resources (e.g., materials, manhours) and their stock levels. Save or load inventory as XML.</li>
+        <li><strong>Product Setup:</strong> Define each product's cost, profit, unit, and carbon footprint. Save or load products as XML.</li>
+        <li><strong>Optimisation Parameters:</strong> Choose your objective (e.g., maximise profit or minimise carbon footprint) and set minimum production constraints.</li>
+        <li><strong>Results:</strong> View the optimal production mix calculated using linear programming. Export or reuse results as needed.</li>
+      </ol>
+      <p style="margin-top: 1rem;">You can navigate between screens at any time. Your data is stored locally in your browser during the session.</p>
+    </div>
+  </div>
+
+  <script>
+    function navigate(page) {
+      window.location.href = page;
+    }
+  </script>
+</body>
+</html>

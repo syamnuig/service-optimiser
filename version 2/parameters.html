@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Optimization Parameters</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app-root">
+    <div class="material-card">
+      <h1 class="app-content-title">Optimization Parameters</h1>
+
+      <label class="form-section-title">
+        Objective:
+        <select id="objective">
+          <option value="maxProfit">Maximum profit</option>
+          <option value="minInventory">Minimum inventory use</option>
+          <option value="maxInventory">Maximum inventory use</option>
+          <option value="minCarbon">Minimum carbon footprint</option>
+        </select>
+      </label>
+
+      <h2 class="form-section-title">Minimum Production per Product</h2>
+      <table id="constraintsTable">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Min Units</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+
+		<div style="display: flex; gap: 1rem; justify-content: flex-end; width: 100%;">
+			<button id="back-to-products-btn" class="selector-btn">← Back</button>
+			<button id="apply-parameters-btn" class="selector-btn">Next →</button>
+		</div>
+
+    </div>
+  </div>
+
+  <script src="parameters.js"></script>
+</body>
+</html>

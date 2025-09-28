@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Inventory</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app-root">
+    <div class="material-card">
+      <h1 class="app-content-title">Inventory Input</h1>
+
+		<table id="inventoryTable">
+		<thead>
+		<tr>
+			<th>Name</th>
+			<th>Quantity</th>
+			<th>Unit</th>
+			<th>Cost/Unit</th>
+			<th>CO₂e/Unit</th>
+			<th></th> <!-- for remove icon -->
+		</tr>
+		</thead>
+		<tbody></tbody>
+		</table>
+
+		<div style="width: 100%; display: flex; justify-content: flex-start;">
+			<button id="add-inventory-btn">Add Item</button>
+		</div>
+
+		<button id="save-inventory-btn">Save to XML</button>
+		<input type="file" id="load-inventory-file" accept=".xml">
+		<div style="display: flex; gap: 1rem; justify-content: flex-end; width: 100%;">
+			<button onclick="window.location.href='index.html'" class="selector-btn">← Back to Home</button>
+			<button id="next-to-products-btn">Next →</button>
+		</div>
+
+    <div class="tool-usage-note">
+      <strong>How to use this screen:</strong>
+      <ol>
+        <li>Define your inventory items and stock levels.</li>
+        <li>Save to XML for reuse or load an existing inventory file.</li>
+        <li>Click Next to proceed to products setup.</li>
+      </ol>
+    </div>
+  </div>
+
+  <script src="inventory.js"></script>
+</body>
+</html>

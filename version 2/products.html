@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Products</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app-root">
+    <div class="material-card">
+      <h1 class="app-content-title">Products Input</h1>
+
+		<table id="productsTable">
+		<thead>
+			<tr>
+			<th>Name</th>
+			<th>Cost/Unit</th>
+			<th>Profit/Unit</th>
+			<th>Unit</th>
+			<th>CO₂e/Unit</th>
+			<th></th> <!-- for remove icon -->
+			</tr>
+		</thead>
+		<tbody></tbody>
+		</table>
+
+		<div style="width: 100%; display: flex; justify-content: flex-start;">
+			<button id="add-product-btn">Add Product</button>
+		</div>
+
+		<button id="save-products-btn">Save to XML</button>
+			<input type="file" id="load-products-file" accept=".xml">
+		<div style="display: flex; gap: 1rem; justify-content: flex-end; width: 100%;">
+			<button id="back-to-inventory-btn" class="selector-btn">
+				← Back
+			</button>
+			<button id="next-to-parameters-btn" class="selector-btn">
+				Next →
+			</button>
+		</div>
+
+    <div class="tool-usage-note">
+      <strong>How to use this screen:</strong>
+      <ol>
+        <li>Define your products and their cost/profit metrics.</li>
+        <li>Save to XML for reuse or load an existing products file.</li>
+        <li>Click Next to set optimization parameters.</li>
+      </ol>
+    </div>
+  </div>
+
+  <script src="products.js"></script>
+</body>
+</html>
