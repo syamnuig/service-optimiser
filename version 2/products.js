@@ -1,6 +1,22 @@
 document.addEventListener('DOMContentLoaded', () => {
   const tableBody = document.querySelector('#productsTable tbody');
   const units     = ['nos', 'kg', 'l', 'm'];
+  let inventory = JSON.parse(sessionStorage.getItem('inventory') || '[]');
+  // Fallback: if inventory names look like a, b, c, d — reset
+  if (inventory.length && inventory.every(item => /^[a-d]$/.test(item.name))) {
+	console.warn('Invalid inventory detected. Resetting sessionStorage.');
+	sessionStorage.clear();
+	inventory = [];
+  }
+
+	// Inject inventory headers
+	const theadRow = document.querySelector('#productsTable thead tr');
+	inventory.forEach(inv => {
+		const th = document.createElement('th');
+		th.textContent = `${inv.name} Used`;
+		theadRow.insertBefore(th, theadRow.lastElementChild); // before Remove column
+	});
+
 
 	function addRow(data = {}) {
 		const tr = document.createElement('tr');
@@ -14,26 +30,45 @@ document.addEventListener('DOMContentLoaded', () => {
 				</select>
 			</td>
 			<td><input type="number" step="0.01" class="prod-co2" value="${data.co2 || ''}"></td>
-			<td>
-				<button class="remove-btn" title="Remove row">❌</button>
-			</td>
+			
 		`;
-		tr.querySelector('.remove-btn').addEventListener('click', () => {
-		tr.remove();
+		// Add inventory usage inputs
+		inventory.forEach(inv => {
+			const usage = data[inv.name] || 0;
+			const td = document.createElement('td');
+			td.innerHTML = `<input type="number" step="0.01" class="inv-use" data-inv="${inv.name}" value="${usage}">`;
+			tr.appendChild(td);
 		});
+
+		// Add remove button if needed
+		const removeTd = document.createElement('td');
+		removeTd.innerHTML = `<button class="remove-btn" title="Remove row">❌</button>`;
+		removeTd.querySelector('.remove-btn').addEventListener('click', () => tr.remove());
+		tr.appendChild(removeTd);
+
 		tableBody.appendChild(tr);
+
 	}
 
 
   function getProductsData() {
-    return [...tableBody.children].map(row => ({
-      name:   row.querySelector('.prod-name').value.trim(),
-      cost:   parseFloat(row.querySelector('.prod-cost').value)   || 0,
-      profit: parseFloat(row.querySelector('.prod-profit').value) || 0,
-      unit:   row.querySelector('.prod-unit').value,
-      co2:    parseFloat(row.querySelector('.prod-co2').value)    || 0
-    }));
+	return [...tableBody.children].map(row => {
+		const product = {
+			name:   row.querySelector('.prod-name').value.trim(),
+			cost:   parseFloat(row.querySelector('.prod-cost').value)   || 0,
+			profit: parseFloat(row.querySelector('.prod-profit').value) || 0,
+			unit:   row.querySelector('.prod-unit').value,
+			co2:    parseFloat(row.querySelector('.prod-co2').value)    || 0
+		};
+
+		row.querySelectorAll('.inv-use').forEach(input => {
+			const key = input.dataset.inv;
+			product[key] = parseFloat(input.value) || 0;
+		});
+		return product;
+	});
   }
+
 
   function saveToXML(items) {
     let xml = '<products>';
@@ -86,9 +121,10 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.getElementById('next-to-parameters-btn').addEventListener('click', () => {
-    localStorage.setItem('products', JSON.stringify(getProductsData()));
+    sessionStorage.setItem('products', JSON.stringify(getProductsData()));
     window.location.href = 'parameters.html';
   });
-
-  addRow();
+  const saved = JSON.parse(sessionStorage.getItem('products') || '[]');
+  if (saved.length) saved.forEach(addRow);
+  else addRow();
 });

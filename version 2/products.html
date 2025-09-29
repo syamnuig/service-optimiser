@@ -1,5 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+<script>
+  const inventory = JSON.parse(localStorage.getItem('inventory') || '[]');
+  const theadRow = document.querySelector('#productsTable thead tr');
+  inventory.forEach(inv => {
+    const th = document.createElement('th');
+    th.textContent = inv.name;
+    theadRow.appendChild(th);
+  });
+</script>
 <head>
   <meta charset="UTF-8">
   <title>Products</title>
@@ -11,18 +20,20 @@
       <h1 class="app-content-title">Products Input</h1>
 
 		<table id="productsTable">
-		<thead>
+			<thead>
 			<tr>
-			<th>Name</th>
-			<th>Cost/Unit</th>
-			<th>Profit/Unit</th>
+			<th>Product Name</th>
+			<th>Cost/Unit (€)</th>
+			<th>Profit/Unit (€)</th>
 			<th>Unit</th>
 			<th>CO₂e/Unit</th>
-			<th></th> <!-- for remove icon -->
+			<!-- Inventory usage headers will be injected here -->
+			<th>Remove</th>
 			</tr>
-		</thead>
-		<tbody></tbody>
+			</thead>
+			<tbody></tbody>
 		</table>
+
 
 		<div style="width: 100%; display: flex; justify-content: flex-start;">
 			<button id="add-product-btn">Add Product</button>
@@ -31,12 +42,9 @@
 		<button id="save-products-btn">Save to XML</button>
 			<input type="file" id="load-products-file" accept=".xml">
 		<div style="display: flex; gap: 1rem; justify-content: flex-end; width: 100%;">
-			<button id="back-to-inventory-btn" class="selector-btn">
-				← Back
-			</button>
-			<button id="next-to-parameters-btn" class="selector-btn">
-				Next →
-			</button>
+			<button id="back-to-inventory-btn" class="selector-btn">← Back</button>
+			<button id="next-to-parameters-btn" class="selector-btn">Next →</button>
+			<button onclick="sessionStorage.clear(); location.reload();">Reset Session</button>
 		</div>
 
     <div class="tool-usage-note">

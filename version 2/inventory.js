@@ -82,9 +82,12 @@ document.addEventListener('DOMContentLoaded', () => {
   );
 
   document.getElementById('next-to-products-btn').addEventListener('click', () => {
-    localStorage.setItem('inventory', JSON.stringify(getInventoryData()));
+    sessionStorage.setItem('inventory', JSON.stringify(getInventoryData()));
     window.location.href = 'products.html';
   });
 
-  addRow();
+  const saved = JSON.parse(sessionStorage.getItem('inventory') || '[]');
+  if (saved.length) saved.forEach(addRow);
+  else addRow();
+
 });

@@ -1,70 +1,98 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const container  = document.getElementById('resultsContainer');
-  const inventory  = JSON.parse(localStorage.getItem('inventory') || '[]');
-  const products   = JSON.parse(localStorage.getItem('products')  || '[]');
-  const params     = JSON.parse(localStorage.getItem('parameters')|| '{}');
+  const container = document.getElementById('resultsContainer');
+  const inventory = JSON.parse(sessionStorage.getItem('inventory') || '[]');
+  const products = JSON.parse(sessionStorage.getItem('products') || '[]');
+  const params = JSON.parse(sessionStorage.getItem('parameters') || '{}');
   const weights = params.weights || { profit: 100, inventory: 0, carbon: 0 };
+  const minUnits = params.minUnits || [];
 
+  // Ensure weights are numbers
+  weights.profit = parseFloat(weights.profit) || 0;
+  weights.inventory = parseFloat(weights.inventory) || 0;
+  weights.carbon = parseFloat(weights.carbon) || 0;
+
+  // Validate input
+  if (!inventory.length || !products.length || !params.weights) {
+    container.innerHTML += `<p style="color: red;">Missing input data. Please complete all steps before calculating.</p>`;
+    return;
+  }
 
   // Build LP model
-	const model = {
-		optimize: 'composite',
-		opType: 'max',
-		constraints: {},
-		variables: {}
-	};
+  const model = {
+    optimize: 'composite',
+    opType: 'max',
+    constraints: {},
+    variables: {}
+  };
 
-	// Inventory constraints
-	inventory.forEach(inv => {
-		model.constraints[inv.name] = { '<=': inv.quantity };
-	});
+  // Inventory constraints
+  inventory.forEach(inv => {
+    model.constraints[inv.name] = { '<=': inv.quantity };
+  });
 
-	// Product variables with weighted composite score
-	products.forEach((p, i) => {
-		const varDef = {};
+  // Product variables
+  products.forEach((p, i) => {
+    const varDef = {};
 
-		// Weighted profit
-		const profitScore = weights.profit * p.profit;
+    // Composite score
+    const profitScore = weights.profit * p.profit;
+    const invUseScore = weights.inventory * inventory.reduce((sum, inv) => sum + (p[inv.name] || 0), 0);
+    const carbonScore = weights.carbon * p.co2;
 
-		// Weighted inventory usage (sum of all inventory used by this product)
-		const invUseScore = weights.inventory * inventory.reduce((sum, inv) => {
-			return sum + (p[inv.name] || 0);
-		}, 0);
+    varDef.composite = profitScore - invUseScore - carbonScore;
 
-		// Weighted carbon footprint
-		const carbonScore = weights.carbon * p.co2;
+    // Inventory usage
+    inventory.forEach(inv => {
+      varDef[inv.name] = p[inv.name] || 0;
+    });
 
-		varDef.composite = profitScore - invUseScore - carbonScore;
+    // Minimum production constraint
+    if (minUnits[i] > 0) {
+      model.constraints[`min_${p.name}`] = { '>=': minUnits[i] };
+      varDef[`min_${p.name}`] = 1;
+    }
 
-		// Add inventory usage to constraints
-		inventory.forEach(inv => {
-			varDef[inv.name] = p[inv.name] || 0;
-		});
+    model.variables[p.name] = varDef;
+  });
 
-		// Add minimum production constraint if specified
-		if (params.minUnits?.[i] > 0) {
-			model.constraints[`min_${p.name}`] = { '>=': params.minUnits[i] };
-			varDef[`min_${p.name}`] = 1;
-		}
-
-		model.variables[p.name] = varDef;
-	});
-
-
-  // Solve and render
+  // Solve
   const results = solver.Solve(model);
-  let html = `<p><strong>Objective:</strong> ${objMap[params.objective] || ''}</p>`;
+
+  // Calculate totals
+  let totalProfit = 0;
+  let totalCO2 = 0;
+
+  products.forEach(p => {
+    const qty = results[p.name] || 0;
+    totalProfit += qty * p.profit;
+    totalCO2 += qty * p.co2;
+  });
+
+  // Render results
+  let html = `<p><strong>Objective Weights:</strong></p>
+  <ul>
+    <li>💰 Profit: ${weights.profit}%</li>
+    <li>📦 Inventory: ${weights.inventory}%</li>
+    <li>🌱 Carbon: ${weights.carbon}%</li>
+  </ul>`;
+
   html += '<table><thead><tr><th>Product</th><th>Quantity</th></tr></thead><tbody>';
   products.forEach(p => {
     html += `<tr><td>${p.name}</td><td>${results[p.name] || 0}</td></tr>`;
   });
-  html += `</tbody></table><p><strong>Total Profit:</strong> ${results.result || 0}</p>`;
-  html += `<p><strong>Total CO₂e:</strong> ${results.carbon || 0}</p>`;
-  container.innerHTML = html;
+  html += '</tbody></table>';
 
+  html += `<p><strong>Total Profit:</strong> ${totalProfit.toFixed(2)}</p>`;
+  html += `<p><strong>Total CO₂e:</strong> ${totalCO2.toFixed(2)}</p>`;
+
+  container.innerHTML = html;
 });
+
+// Navigation
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('back-to-parameters-btn').addEventListener('click', () => {
     window.location.href = 'parameters.html';
   });
 });
+
+
