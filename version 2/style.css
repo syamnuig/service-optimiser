@@ -252,3 +252,37 @@ select:focus {
     flex-direction: column;
   }
 }
+
+.slider-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+  width: 100%;
+  margin-bottom: 2rem;
+}
+
+.slider-row {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+}
+
+.slider-row label {
+  flex: 1.2;
+  font-size: 1.13rem;
+  font-weight: 500;
+  color: #234;
+  text-align: left;
+}
+
+.slider-row input[type="range"] {
+  flex: 2;
+  accent-color: var(--primary-blue);
+}
+
+.slider-row span {
+  flex: 0.5;
+  font-weight: 600;
+  color: var(--primary-blue-dark);
+  text-align: right;
+}

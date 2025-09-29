@@ -3,57 +3,53 @@ document.addEventListener('DOMContentLoaded', () => {
   const inventory  = JSON.parse(localStorage.getItem('inventory') || '[]');
   const products   = JSON.parse(localStorage.getItem('products')  || '[]');
   const params     = JSON.parse(localStorage.getItem('parameters')|| '{}');
-  const objMap     = {
-    maxProfit:    'Maximum profit',
-    minInventory: 'Minimum inventory use',
-    maxInventory: 'Maximum inventory use',
-    minCarbon:    'Minimum carbon footprint'
-  };
+  const weights = params.weights || { profit: 100, inventory: 0, carbon: 0 };
+
 
   // Build LP model
-  const model = { optimize: 'profit', opType: 'max', constraints: {}, variables: {} };
-  inventory.forEach(inv => {
-    model.constraints[inv.name] = { '<=': inv.quantity };
-  });
+	const model = {
+		optimize: 'composite',
+		opType: 'max',
+		constraints: {},
+		variables: {}
+	};
 
-  products.forEach((p, i) => {
-    const varDef = { profit: p.profit };
-    inventory.forEach(inv => {
-      varDef[inv.name] = p[inv.name] || 0;
-    });
-    if (params.minUnits?.[i] > 0) {
-      model.constraints[`min_${p.name}`] = { '>=': params.minUnits[i] };
-      varDef[`min_${p.name}`] = 1;
-    }
-    model.variables[p.name] = varDef;
-  });
+	// Inventory constraints
+	inventory.forEach(inv => {
+		model.constraints[inv.name] = { '<=': inv.quantity };
+	});
 
-  // Adjust objective
-  if (params.objective === 'minCarbon') {
-    model.optimize = 'carbon';
-    model.opType   = 'min';
-    products.forEach((p) => {
-      model.variables[p.name].carbon = p.co2;
-    });
-  }
-  if (params.objective === 'minInventory') {
-    model.optimize = 'invUse';
-    model.opType   = 'min';
-    products.forEach((p) => {
-      inventory.forEach(inv => {
-        model.variables[p.name].invUse = p[inv.name] || 0;
-      });
-    });
-  }
-  if (params.objective === 'maxInventory') {
-    model.optimize = 'invUse';
-    model.opType   = 'max';
-    products.forEach((p) => {
-      inventory.forEach(inv => {
-        model.variables[p.name].invUse = p[inv.name] || 0;
-      });
-    });
-  }
+	// Product variables with weighted composite score
+	products.forEach((p, i) => {
+		const varDef = {};
+
+		// Weighted profit
+		const profitScore = weights.profit * p.profit;
+
+		// Weighted inventory usage (sum of all inventory used by this product)
+		const invUseScore = weights.inventory * inventory.reduce((sum, inv) => {
+			return sum + (p[inv.name] || 0);
+		}, 0);
+
+		// Weighted carbon footprint
+		const carbonScore = weights.carbon * p.co2;
+
+		varDef.composite = profitScore - invUseScore - carbonScore;
+
+		// Add inventory usage to constraints
+		inventory.forEach(inv => {
+			varDef[inv.name] = p[inv.name] || 0;
+		});
+
+		// Add minimum production constraint if specified
+		if (params.minUnits?.[i] > 0) {
+			model.constraints[`min_${p.name}`] = { '>=': params.minUnits[i] };
+			varDef[`min_${p.name}`] = 1;
+		}
+
+		model.variables[p.name] = varDef;
+	});
+
 
   // Solve and render
   const results = solver.Solve(model);
@@ -66,6 +62,8 @@ document.addEventListener('DOMContentLoaded', () => {
   html += `<p><strong>Total CO₂e:</strong> ${results.carbon || 0}</p>`;
   container.innerHTML = html;
 
+});
+document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('back-to-parameters-btn').addEventListener('click', () => {
     window.location.href = 'parameters.html';
   });
