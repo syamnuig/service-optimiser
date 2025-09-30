@@ -34,12 +34,14 @@ document.addEventListener('DOMContentLoaded', () => {
   products.forEach((p, i) => {
     const varDef = {};
 
-    // Composite score
+    // Composite score calculation
     const profitScore = weights.profit * p.profit;
     const invUseScore = weights.inventory * inventory.reduce((sum, inv) => sum + (p[inv.name] || 0), 0);
     const carbonScore = weights.carbon * p.co2;
 
-    varDef.composite = profitScore - invUseScore - carbonScore;
+    // Scale composite score to avoid unbounded growth
+    varDef.composite = Math.max(0.01, (profitScore - invUseScore - carbonScore) / 100);
+    varDef.integer = true;
 
     // Inventory usage
     inventory.forEach(inv => {
@@ -52,11 +54,29 @@ document.addEventListener('DOMContentLoaded', () => {
       varDef[`min_${p.name}`] = 1;
     }
 
+    // Dynamic production cap based on inventory
+    const maxUnits = Math.min(
+      ...inventory.map(inv => {
+        const usage = p[inv.name] || 0;
+        return usage > 0 ? Math.floor(inv.quantity / usage) : Infinity;
+      })
+    );
+
+
+
     model.variables[p.name] = varDef;
   });
 
+
   // Solve
   const results = solver.Solve(model);
+  console.log('Solver Results:', results);
+  console.table(products.map(p => ({
+	Product: p.name,
+	Quantity: results[p.name] || 0,
+	Profit: p.profit,
+	CO2: p.co2
+  })));
 
   // Calculate totals
   let totalProfit = 0;
@@ -94,5 +114,3 @@ document.addEventListener('DOMContentLoaded', () => {
     window.location.href = 'parameters.html';
   });
 });
-
-

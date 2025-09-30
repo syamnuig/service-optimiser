@@ -9,25 +9,28 @@
   <div id="app-root">
     <div class="material-card">
       <h1 class="app-content-title">Optimization Parameters</h1>
-	  
-		<h2 class="form-section-title">Multi-Objective Weights</h2>
-		<div class="slider-form">
-			<div class="slider-row">
-				<label for="weight-profit">💰 Profit Optimisation</label>
-				<input type="range" id="weight-profit" min="0" max="100" value="100" oninput="updateLabel('profit')">
-				<span id="label-profit">100%</span>
-			</div>
-			<div class="slider-row">
-				<label for="weight-inventory">📦 Inventory Usage</label>
-				<input type="range" id="weight-inventory" min="0" max="100" value="0" oninput="updateLabel('inventory')">
-				<span id="label-inventory">0%</span>
-			</div>
-			<div class="slider-row">
-				<label for="weight-carbon">🌱 CO2e Optimisation</label>
-				<input type="range" id="weight-carbon" min="0" max="100" value="0" oninput="updateLabel('carbon')">
-				<span id="label-carbon">0%</span>
-			</div>
-		</div>
+
+      <h2 class="form-section-title">Multi-Objective Weights</h2>
+      <div class="slider-form">
+        <div class="slider-row">
+          <label for="weight-profit">💰 Profit Optimisation</label>
+          <input type="range" id="weight-profit" min="0" max="100" value="100" oninput="updateLabel('profit')">
+          <span id="label-profit">100%</span>
+        </div>
+        <div class="slider-row">
+          <label for="weight-inventory">📦 Inventory Usage</label>
+          <input type="range" id="weight-inventory" min="0" max="100" value="0" oninput="updateLabel('inventory')">
+          <span id="label-inventory">0%</span>
+        </div>
+        <div class="slider-row">
+          <label for="weight-carbon">🌱 CO₂e Optimisation</label>
+          <input type="range" id="weight-carbon" min="0" max="100" value="0" oninput="updateLabel('carbon')">
+          <span id="label-carbon">0%</span>
+        </div>
+      </div>
+
+      <!-- Optional summary box -->
+      <div id="weight-values" class="weight-summary-box"></div>
 
       <h2 class="form-section-title">Minimum Production per Product</h2>
       <table id="constraintsTable">
@@ -40,11 +43,10 @@
         <tbody></tbody>
       </table>
 
-		<div style="display: flex; gap: 1rem; justify-content: flex-end; width: 100%;">
-			<button id="back-to-products-btn" class="selector-btn">← Back</button>
-			<button id="apply-parameters-btn" class="selector-btn">Next →</button>
-		</div>
-
+      <div style="display: flex; gap: 1rem; justify-content: flex-end; width: 100%;">
+        <button id="back-to-products-btn" class="selector-btn">← Back</button>
+        <button id="apply-parameters-btn" class="selector-btn">Next →</button>
+      </div>
     </div>
   </div>
 

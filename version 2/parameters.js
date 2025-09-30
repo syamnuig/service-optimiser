@@ -46,11 +46,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		document.getElementById('weight-carbon').value = savedWeights.carbon;
 		document.getElementById('label-carbon').textContent = `${savedWeights.carbon}%`;
 	}
-
-	// Optional: update summary box if you're showing active weights
-	updateSummary();
-
-  
   
 });
 
